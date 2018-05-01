@@ -1,6 +1,22 @@
 #include <iostream>
 #include <stdio.h>
 #define DEBUG 0
+/**********************************************
+ *    Dijital Enigma D                        *
+ *Hazırlayanlar: Özgün Bozay ve Berkan Şahin  *
+ *                                            *
+ *Giriş olarak aldığı karakteri rotorlar      *
+ *üzerinden geçirerek çıkışa şifrelenmiş      *
+ *olarak verir                                *
+ *                                            * 
+ **********************************************/
+
+/*****************************************************************
+ *Rotor tanımlamları:                                            *
+ *rotorlardaki harflerin sıraları gerçek Enigma'daki             *
+ *rotorların a'dan z'ye girişlerinin bağlantılarını temsil eder. *
+ *Örn: type1'de a ->l , b -> p vs.                               *
+ *****************************************************************/
 
 char etw[]    = "QWERTZUIOASDFGHJKPYXCVBNML";
 char type1[]  = "LPGSZMHAEOQKVXRFYBUTNICJDW";
@@ -10,48 +26,66 @@ char rev[]    = "IMETCGFRAYSQBZXWLHKDVUPOJN";
 char type3r[] = "LVADZPCGYBHXQSVETKFIJWMORN";
 char type2r[] = "SEWYMGDLOIUBTXKVJPAFZCNHRQ";
 char type1r[] = "HRWYIPCGVXLAFUJBKODTSMZNQE";
+//Geçici değişken tanımlama
 char input;
 char buffer;
-unsigned int pos1,pos2,pos3 = 1; 
+//Pozisyon değişkenleri tanımlama
+unsigned int pos1,pos2,pos3 = 1;
+
+//Ana program içinde kullanılacak foksiyonların tanımlanması
 char uppercase(char input);
 char rotor(char input, char rotor[], unsigned int pos);
 char reverserotor(char input, char rotor[], unsigned int pos);
 int main(void){
 
-	printf("Type in a dot to change rotor alignment\nType in a dash to quit\n");
-	for(;;){
-	  std::cin >> buffer;
-	  int bojingles = (int)buffer;
+	printf("Dijital Enigma D\nHazırlayanlar: Özgün Bozay ve Berkan Şahin\n\n");
 
+	//Sonsuz döngü
+	for(;;){
+	  printf("Rotor pozisyonlarını değiştirmek için \".\" karakterini yazın.\nProgramdan çıkış için \"-\" karakterini yazın.\n");
+	  //Kullanıcıdan bir karakter istenir
+	  std::cin >> buffer;
+	  //kullanıcıdan alınan karakter ASCII'deki sayı karşılığı olarak atanır
+	  int bojingles = (int)buffer;
+	  //Kullanıcdan alınan karakterin . veya - olup olmadığı kontrol edilir.
 		if(bojingles == 46) {
 
-			printf("Type in 3 integers for rotor positions respectively for rotor 3, 2 and 1.\n");
+			printf("Sırasıyla rotor 3,2 ve 1\'in pozisyonlarını belirlemek için 3 adet tamsayı yazın.\n");
 			std::cin >> pos3;
 			if((pos3 >26) || (pos3<=0)) pos3 = 1;
-			printf("New position for rotor 3 is:%u\n", pos3);
+			printf("Rotor 3\'ün yeni pozisyonu:%u\n", pos3);
 			std::cin >> pos2;
 			if((pos2 > 26) || (pos2<=0)) pos2 = 1;
-			printf("New position for rotor 2 is:%u\n", pos2);
+			printf("Rotor 2\'nin yeni pozisyonu:%u\n", pos2);
 			std::cin >> pos1;
 			if((pos1 > 26) || (pos1<=0)) pos1 = 1;
-			printf("New position for rotor 1 is:%u\n", pos1);
+			printf("Rotor 1\'in yeni pzisyonu:%u\n", pos1);
 		}
 		
 		else if(bojingles == 45) return 0;
+		else if(bojingles > 127){
 
+		  printf("Geçersiz karakter.\n");
+		  return 0;
+		}
 		else{
 
-		  	pos1++;
+		        //Rotor pozisyonlarının arttırılması
+		        pos1++;
 			if(pos1 > 26) pos1 = 1;
 			if(pos1 == 8) pos2++;	
 			if(pos2 > 26) pos2 = 1;
 			if(pos2 == 15) pos3++;
 			if(pos3 > 26) pos3 = 1;
+
+			//Değişkenin yeniden karakter olması ve büyük harfe dönüştürülmesi
 			
 			input = uppercase(buffer);
 			//if(DEBUG) std::cout << "uppercase "<< input << std::endl;
 			//input = rotor(input, etw, 1);
 			//if(DEBUG) std::cout <<"etw "<< input << std::endl;
+
+			//input değişkeni sırayla rotorlardan geçer
 			input = rotor(input, type1, pos1);
 			if(DEBUG) std::cout <<"rotor1-1 "<< input << std::endl;
 			input = rotor(input, type2, pos2);
@@ -67,8 +101,10 @@ int main(void){
 			input = reverserotor(input, type1r, pos1);
 			if(DEBUG) std::cout <<"rotor1-2 "<< input << std::endl;
 			//input = rotor(input, etw, 1);
+
+			//Sonuç olan harfi ve rotor pozisyonlarını yaz
 			printf("%c\n", input);
-			printf("Positions of the rotors are:\n %u-%u-%u\n", pos3 , pos2 ,pos1);
+			printf("Rotor Pozisyonları:\n%u-%u-%u\n", pos3 , pos2 ,pos1);
 		
 
 		}
@@ -76,7 +112,7 @@ int main(void){
 
 
 	}
-	return 1;
+	return 2;
 }
 
 char uppercase(char input){
@@ -89,6 +125,12 @@ char uppercase(char input){
 
 char rotor(char input, char rotor[], unsigned int pos){
 
+  /*********************************************************************
+  *Bu fonksiyonda karakterler rotor pozisyonuna göre 0 ile 25 arasında *
+  *bir değer alır (Enigma'daki A-Z girişleri). Daha sonra bu değer     *
+  *verilen rotor üzerine yerleştirilip çıkan sonuç dışarı verilir      *
+  *********************************************************************/
+  
   int heleloy = (int)input;
   heleloy = heleloy-66+pos;
   if(heleloy > 25) heleloy = heleloy-26;
@@ -99,6 +141,12 @@ char rotor(char input, char rotor[], unsigned int pos){
 
 char reverserotor(char input, char rotor[], unsigned int pos){
 
+  /*************************************************************************************
+   *Bu fonksiyonda Enigma'nın doğası dikkate alınarak verilen rotor dizisi üzerinde    *
+   *oynamalar yapılıp tersi çıkarılır. Daha sonra bu dizi üzerinde diğer rotor         *
+   *fonksiyonu uygulanır.                                                              *
+   *************************************************************************************/
+  
   int heleloy;
   char altrotor[26];
   for(int i = 0; i < 26; i++){
