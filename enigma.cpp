@@ -3,6 +3,7 @@
 #define DEBUG 0
 /**********************************************
  *    Dijital Enigma D                        *
+ *    brainrot moments
  *    shikanoko nokonoko koshitantan
  *Hazırlayanlar: Özgün Bozay ve Berkan Şahin  *
  *                                            *
